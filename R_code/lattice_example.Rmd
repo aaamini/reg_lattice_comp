@@ -1,0 +1,51 @@
+---
+#title: "lattice_examples"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+\pagenumbering{gobble} 
+
+```{r}
+source("gaussian_projections_base.R") # make sure this file is in your current directory, or add /path/to/ as needed
+source("lattice_comp.R")
+
+
+if (file.exists('Bexample2.RData')) {
+  load('Bexample2.RData')
+  d <- dim(B)[1]
+} else {
+  d <- 10 
+  B <- rsparsematrix(d,d,density=.3, symmetric = T)
+  B[lower.tri(B,diag=T)] <- 0
+  Omega <- eye(d)
+  
+}
+
+dag_cov <- function(B,Omega){
+  d <- dim(B)[1]
+  R <- eye(d) - B
+  Gamma <- drop0(zapsmall(R %*% solve(Omega) %*% t(R)))
+  Sig <- drop0(zapsmall(solve(Gamma)))
+  return( list(Gamma=Gamma, Sig=Sig))
+}
+
+out <- dag_cov(B,Omega)
+Gamma <- out$Gamma
+Sig <- out$Sig
+
+
+all_nodes <- 1:nrow(Sig)
+j <- 2
+
+#lattices <- computeAllSubordinateLattices(j, Sig, all_nodes, print.width = 20, VERB=2)
+#is_set_in_lattices(c(1,3,7,8,9),lattices)
+#lattices <- computeAllSubordinateLattices(j, Sig, all_nodes, root_S = c(1,3,7,8,9), print.width = 13, VERB=2)
+lattices <- computeAllSubordinateLattices(j, Sig, all_nodes, root_S = c(1,3,7,8,9), print.width = 20, VERB=2)
+
+
+```
+
